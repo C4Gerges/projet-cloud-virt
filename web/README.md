@@ -2,12 +2,13 @@
 
 Requirements:
 
-- NodeJS 20 or later: https://nodejs.org/en/
+- NodeJS 24 (LTS) or later: https://nodejs.org/en/
 
 ## Configuration
 
-The application loads a configuration file on start which lives in the [`public/`](./public/config.json) folder.
-This configuration file sets the URL of the API to use.
+The application loads a configuration file on start which lives in the
+[`public/`](./public/config.json) folder. This configuration file sets the URL
+of the API to use.
 
 ## Quick Start
 

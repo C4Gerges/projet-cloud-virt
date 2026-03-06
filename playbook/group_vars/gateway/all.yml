@@ -1,4 +1,0 @@
----
-cloudflared_tunnel_token: "{{ vault_cloudflared_tunnel_token }}"
-all_vxlans: true
-vxlan_dns: false

@@ -1,5 +1,6 @@
 import enum
 from io import BytesIO
+from typing import Any
 
 from celery import Celery
 from celery.signals import worker_process_init
@@ -10,7 +11,7 @@ from .storage import bucket
 
 
 @worker_process_init.connect(weak=False)
-def init_celery_tracing(*args, **kwargs):
+def init_celery_tracing(*args: Any, **kwargs: Any) -> None:
     CeleryInstrumentor().instrument()
 
 
@@ -40,7 +41,7 @@ def format_map(format: str) -> str:
 
 
 @app.task
-def resize_image(key: str, size: Sizes):
+def resize_image(key: str, size: Sizes) -> None:
     size = Sizes(size)
     if size == Sizes.Original:
         return

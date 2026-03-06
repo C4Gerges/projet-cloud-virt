@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileWithPath, useDropzone } from "react-dropzone";
+import { type FileWithPath, useDropzone } from "react-dropzone";
 import File from "./File";
 
 const DropZone = () => {

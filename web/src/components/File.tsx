@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { useContext, useState } from "react";
-import { FileWithPath } from "react-dropzone";
+import { type FileWithPath } from "react-dropzone";
 import { useQuery } from "@tanstack/react-query";
 import ConfigContext from "./ConfigContext";
 

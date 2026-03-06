@@ -1,3 +1,0 @@
-vxlan_local_interface: enp3s0
-vxlan_local_interface_config: 10-netplan-enp3s0.network
-vxlan_multicast_group: 224.42.42.42

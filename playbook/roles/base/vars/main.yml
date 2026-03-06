@@ -1,7 +1,0 @@
----
-consul_version: 1.20.5
-nomad_version: 1.9.7
-compose_switch_version: 1.0.5
-cni_plugins_version: 1.6.2
-minio_version: 2025-03-12T18-04-18Z
-mc_version: 2025-03-12T17-29-24Z

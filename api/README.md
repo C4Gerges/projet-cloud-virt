@@ -1,28 +1,29 @@
 ## Description
 
-This is the backend of the app.
-It has two components:
+This is the backend of the app. It has two components:
 
- - The Celery worker, which runs image resizing tasks
- - The Flask server, which serves the API to upload new images
+- The Celery worker, which runs image resizing tasks
+- The Flask server, which serves the API to upload new images
 
 ## Configuration
 
-Configuration is loaded from the [`config.py`](./config.py) file.
-By default, this file reads environment variables to configure the application:
+Configuration is loaded from the [`config.py`](./config.py) file. By default,
+this file reads environment variables to configure the application:
 
- - `CELERY_BROKER_URL`: URL of the message broker
- - `S3_ENDPOINT_URL`: Endpoint of the S3 service
- - `AWS_ACCESS_KEY_ID`: Access key used for authenticating S3 operations
- - `AWS_SECRET_ACCESS_KEY`: Secret key used for authenticating S3 operations
- - `S3_BUCKET_NAME`: Bucket to use for storing images
+- `CELERY_BROKER_URL`: URL of the message broker
+- `S3_ENDPOINT_URL`: Endpoint of the S3 service
+- `AWS_ACCESS_KEY_ID`: Access key used for authenticating S3 operations
+- `AWS_SECRET_ACCESS_KEY`: Secret key used for authenticating S3 operations
+- `S3_BUCKET_NAME`: Bucket to use for storing images
 
 ## Try out the API
 
-The easiest way to try the API locally is to use [Poetry](https://python-poetry.org) to install dependencies, Redis as message broker and Minio for S3-compatible storage.
+The easiest way to try the API locally is to use
+[uv](https://docs.astral.sh/uv/) to install dependencies, Redis as message
+broker and Minio for S3-compatible storage.
 
 ```sh
-# Install Poetry
+# Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Install dependencies
@@ -65,8 +66,10 @@ uv sync --no-dev --locked
 
 ### Run the web server
 
-The application exposes a WSGI-compatible API under the `image_api.web:app` module.
-Any WSGI-compatible server can be used, like [`gunicorn`](https://gunicorn.org) or [`waitress`](https://docs.pylonsproject.org/projects/waitress/en/stable/usage.html).
+The application exposes a WSGI-compatible API under the `image_api.web:app`
+module. Any WSGI-compatible server can be used, like
+[`gunicorn`](https://gunicorn.org) or
+[`waitress`](https://docs.pylonsproject.org/projects/waitress/en/stable/usage.html).
 
 Example with `gunicorn`:
 

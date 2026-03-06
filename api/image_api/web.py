@@ -3,7 +3,8 @@ from urllib.parse import unquote
 
 from botocore.exceptions import ClientError
 from celery.canvas import group
-from flask import Flask, request, url_for
+from flask import Flask, Response, request, url_for
+from flask.typing import ResponseReturnValue
 from flask_cors import CORS
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 
@@ -16,12 +17,12 @@ if bucket.creation_date is None:
     bucket.create()
 
 app = Flask(__name__)
-FlaskInstrumentor().instrument_app(app)
+FlaskInstrumentor().instrument_app(app)  # type: ignore[no-untyped-call]
 CORS(app)
 
 
 @app.route("/")
-def index():
+def index() -> dict[str, str]:
     return {
         "upload_url": unquote(url_for("upload")),
         "original_image_url": unquote(url_for("original", id="{id}")),
@@ -33,7 +34,7 @@ def index():
 
 
 @app.route("/image", methods=["POST"])
-def upload():
+def upload() -> ResponseReturnValue:
     """Upload the image to the S3 bucket"""
     if "file" not in request.files:
         return {"error": "missing file"}, 400
@@ -66,7 +67,7 @@ def upload():
     }, 201
 
 
-def stream_image(id: str, size: Sizes):
+def stream_image(id: str, size: Sizes) -> Response | tuple[str, int]:
     # Fail fast if the ID does not have the right shape
     if not valid_id(id):
         return "invalid id", 400
@@ -81,7 +82,7 @@ def stream_image(id: str, size: Sizes):
         args["IfModifiedSince"] = if_modified_since
 
     try:
-        obj = bucket.Object(f"{size.segment}/{id}").get(**args)  # type: ignore
+        obj = bucket.Object(f"{size.segment}/{id}").get(**args)
     except s3.meta.client.exceptions.NoSuchKey:
         # If the key was not found, return a 404
         return "not found", 404
@@ -106,42 +107,42 @@ def stream_image(id: str, size: Sizes):
 
 
 @app.route("/image/<id>", methods=["GET"])
-def original(id: str):
+def original(id: str) -> Response | tuple[str, int]:
     """Serve the original image from the S3 bucket"""
     return stream_image(id, Sizes.Original)
 
 
 @app.route("/image/<id>/big", methods=["GET"])
-def big(id: str):
+def big(id: str) -> Response | tuple[str, int]:
     """Serve the big thumbnail image from the S3 bucket"""
     return stream_image(id, Sizes.Big)
 
 
 @app.route("/image/<id>/medium", methods=["GET"])
-def medium(id: str):
+def medium(id: str) -> Response | tuple[str, int]:
     """Serve the medium thumbnail image from the S3 bucket"""
     return stream_image(id, Sizes.Medium)
 
 
 @app.route("/image/<id>/small", methods=["GET"])
-def small(id: str):
+def small(id: str) -> Response | tuple[str, int]:
     """Serve the small thumbnail image from the S3 bucket"""
     return stream_image(id, Sizes.Small)
 
 
 @app.route("/image/<id>/tiny", methods=["GET"])
-def tiny(id: str):
+def tiny(id: str) -> Response | tuple[str, int]:
     """Serve the tiny thumbnail image from the S3 bucket"""
     return stream_image(id, Sizes.Tiny)
 
 
 @app.route("/health", methods=["GET"])
-def health():
+def health() -> str:
     """Simple healtcheck route to check the service is running properly"""
     return "ok"
 
 
-def dev():
+def dev() -> None:
     app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False)
 
 
