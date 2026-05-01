@@ -1,0 +1,100 @@
+configs:
+  frontend_config:
+    file: ./config/frontend-config.json
+
+networks:
+  app_net:
+    driver: overlay
+
+services:
+
+  frontend:
+    image: ${REGISTRY}/cloud-virt-frontend:${IMAGE_TAG:-latest}
+    deploy:
+      replicas: 2
+      placement:
+        constraints:
+          - node.labels.role == lb
+        max_replicas_per_node: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 5s
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    configs:
+      - source: frontend_config
+        target: /usr/share/nginx/html/config.json
+    networks:
+      - app_net
+    ports:
+      - target: 80
+        published: 8080
+        mode: ingress
+
+  api:
+    image: ${REGISTRY}/cloud-virt-api:${IMAGE_TAG:-latest}
+    deploy:
+      replicas: 3
+      placement:
+        max_replicas_per_node: 1
+      update_config:
+        parallelism: 1
+        delay: 15s
+        order: start-first
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 5s
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      CELERY_BROKER_URL: ${RABBITMQ_URL}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION_NAME: ${AWS_REGION_NAME}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+    networks:
+      - app_net
+    ports:
+      - target: 8080
+        published: 3001
+        mode: ingress
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  worker:
+    image: ${REGISTRY}/cloud-virt-worker:${IMAGE_TAG:-latest}
+    deploy:
+      replicas: 2
+      placement:
+        preferences:
+          - spread: node.labels.role
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 5s
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      CELERY_BROKER_URL: ${RABBITMQ_URL}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION_NAME: ${AWS_REGION_NAME}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+    networks:
+      - app_net

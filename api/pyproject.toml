@@ -21,6 +21,7 @@ dependencies = [
     "opentelemetry-instrumentation-flask==0.60b1",
     "opentelemetry-instrumentation-redis==0.60b1",
     "opentelemetry-instrumentation-urllib3==0.60b1",
+    "gunicorn>=23.0.0",
 ]
 name = "image_api"
 description = "Image resizer API"
