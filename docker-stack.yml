@@ -77,10 +77,9 @@ services:
   worker:
     image: ${REGISTRY}/cloud-virt-worker:${IMAGE_TAG:-latest}
     deploy:
-      replicas: 1
+      replicas: 3
       placement:
-        constraints:
-          - node.labels.role == app
+        max_replicas_per_node: 1
       update_config:
         parallelism: 1
         delay: 10s
