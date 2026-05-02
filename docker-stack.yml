@@ -34,13 +34,16 @@ services:
       - app_net
     ports:
       - target: 80
-        published: 8080
+        published: 3000
         mode: ingress
 
   api:
     image: ${REGISTRY}/cloud-virt-api:${IMAGE_TAG:-latest}
     deploy:
       replicas: 3
+      resources:
+        limits:
+          memory: 256M
       placement:
         max_replicas_per_node: 1
       update_config:
@@ -64,7 +67,7 @@ services:
       - app_net
     ports:
       - target: 8080
-        published: 3001
+        published: 8080
         mode: ingress
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -76,10 +79,10 @@ services:
   worker:
     image: ${REGISTRY}/cloud-virt-worker:${IMAGE_TAG:-latest}
     deploy:
-      replicas: 2
+      replicas: 1
       placement:
-        preferences:
-          - spread: node.labels.role
+        constraints:
+          - node.labels.role == app
       update_config:
         parallelism: 1
         delay: 10s
