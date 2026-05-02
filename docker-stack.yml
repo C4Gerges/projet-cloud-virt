@@ -35,15 +35,12 @@ services:
     ports:
       - target: 80
         published: 3000
-        mode: ingress
+        mode: host
 
   api:
     image: ${REGISTRY}/cloud-virt-api:${IMAGE_TAG:-latest}
     deploy:
       replicas: 3
-      resources:
-        limits:
-          memory: 256M
       placement:
         max_replicas_per_node: 1
       update_config:
@@ -57,6 +54,7 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
+    command: ["/app/.venv/bin/gunicorn", "image_api.web:app", "--bind", "0.0.0.0:8080", "--workers", "1"]
     environment:
       CELERY_BROKER_URL: ${RABBITMQ_URL}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
@@ -68,9 +66,9 @@ services:
     ports:
       - target: 8080
         published: 8080
-        mode: ingress
+        mode: host
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/health')\""]
       interval: 15s
       timeout: 5s
       retries: 3
