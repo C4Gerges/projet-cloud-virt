@@ -141,7 +141,6 @@ main() {
     step "Déploiement terminé"
     log "Frontend : https://gerges.maurice-cloud.fr"
     log "API      : https://api.gerges.maurice-cloud.fr/health"
-    log "HAProxy stats : http://192.168.9.110:9000/stats (admin/cloudvirt)"
 }
 
 main "$@"
